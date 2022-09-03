@@ -1,0 +1,33 @@
+body {
+    padding: 0px;
+    margin: 0px;
+}
+
+table {
+    border-collapse: collapse;
+    position: relative;
+    top: 16px;
+    left: 16px;
+}
+
+td {
+    border:  solid black 2px;
+    padding: 16px;
+    margin: 24px;
+}
+
+button {
+    margin-top: 40px;
+    margin-left: 24px;
+    padding: 12px 48px;
+    background-color: aqua;
+}
+
+li {
+    list-style-type: none;
+}
+
+form,
+.add-btn {
+    visibility: hidden;
+}
