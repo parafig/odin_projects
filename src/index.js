@@ -1,24 +1,22 @@
 
 
-const domManipulation = (function() {
-    const container = document.createElement("div");
-    container.classList.add("container");
-
-    const todoContent = document.createElement("div");
-    todoContent.classList.add("todo-content");
+const toDo = (function() {
 
     const createTodoContent = () => {
         console.log("New Content");
+        const todoContent = document.createElement("div");
+        todoContent.classList.add("todo-content");
 
         const todoList = document.createElement("ul");
         todoList.classList.add("todo-list");
-        todoContent.addEventListener('click', newTask);
+        todoContent.addEventListener('click', startNewTask);
 
         const addBtn = createAddBtn(); 
 
         todoContent.appendChild(addBtn);
-        todoContent.appendChild(todoList)
+        todoContent.appendChild(todoList);
 
+        return todoContent;
     }
 
     const createAddBtn = () => {
@@ -28,46 +26,47 @@ const domManipulation = (function() {
         return btn;
     }
 
-    const createInput = () => {
-        const inputUser = document.createElement("input");
-        inputUser.classList.add("msg-from-user");
+    const addNewTask = (e) => {
+        if (e.key == "Enter") {
+            const todoContent = document.querySelector(".todo-content")
+            const taskInput = document.querySelector(".msg-from-user");
+
+            const todo = document.createElement("li");
+            todo.textContent = taskInput.value;
+
+            const todoList = document.querySelector(".todo-list")
+            todoList.appendChild(todo);
+
+            todoContent.removeChild(taskInput)
+
+            const btn = createAddBtn();
+            todoContent.appendChild(btn);
+        }
     }
 
-    const newTask = (e) => {
+    const startNewTask = (e) => {
         if (e.target.tagName == "BUTTON") {
-            const btn = document.querySelector(".btn-ex")
+            const todoContent = document.querySelector(".todo-content");
+            const btn = document.querySelector(".btn-ex");
             todoContent.removeChild(btn);
 
             const inputUser = document.createElement("input");
             inputUser.classList.add("msg-from-user");
 
             todoContent.append(inputUser);
-            inputUser.addEventListener("keypress", (e) => {
-                if (e.key == "Enter") {
-                    const taskInput = document.querySelector(".msg-from-user");
 
-                    const todo = document.createElement("li");
-                    todo.textContent = taskInput.value;
-
-                    const todoList = document.querySelector(".todo-list")
-                    todoList.appendChild(todo);
-
-                    todoContent.removeChild(taskInput)
-
-                    const btn = document.createElement("button");
-                    btn.textContent = "add";
-                    btn.classList.add("btn-ex");
-                    todoContent.appendChild(btn);
-                }
-            })
+            inputUser.addEventListener("keypress", addNewTask);
         }
     }
 
-
-    const body = document.querySelector("body");
-    createTodoContent();
-    container.appendChild(todoContent);
-    body.appendChild(container);
-
+    return {createTodoContent};
 })()
+
+const body = document.querySelector("body");
+const container = document.createElement("div");
+container.classList.add("container");
+
+const todoContent = toDo.createTodoContent();
+container.appendChild(todoContent);
+body.appendChild(container);
 
