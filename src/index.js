@@ -1,10 +1,10 @@
 // TODO crear show o display para mostrar el contenido creado(nodos) ya sea,
 // en un modulo nuevo o funciones dentro del modulo toDO
-// TODO crear codigo que valide los input de la forma.
-// TODO crear la posibilidad de editar, borrar  o actualizar un item.
 // TODO crear logica capaz de declarar una tarea como terminada.
+// TODO refactorizar el evento que permite editar un item y las cosas
+// relacionadas a el.
 
-const toDo = (function () {
+const toDo = (function toDo() {
   const createNewItemBtn = () => {
     const btn = document.createElement('button');
     btn.textContent = 'New';
@@ -25,23 +25,90 @@ const toDo = (function () {
     return todoContent;
   };
 
+  const createOption = (value) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.text = value;
+    return option;
+  };
+
+  const createPriority = (valueSelected) => {
+    const hightPriotity = createOption('High');
+    const mediumPriority = createOption('Medium');
+    const lowPriority = createOption('Low');
+    const todoPriorityInput = document.createElement('select');
+    todoPriorityInput.setAttribute('name', 'priority');
+
+    todoPriorityInput.append(lowPriority, mediumPriority, hightPriotity);
+
+    const children = todoPriorityInput.childNodes;
+    children.forEach((child) => {
+      console.log(child);
+      if (child.value === valueSelected) {
+        child.setAttribute('selected', '');
+      }
+    });
+
+    return todoPriorityInput;
+  };
+
   const createNewITem = (title, description, date, priority) => {
     const todoItem = document.createElement('div');
     todoItem.classList.add('todo-item');
 
     const todoTitle = document.createElement('h2');
+    todoTitle.setAttribute('contenteditable', 'false');
     todoTitle.textContent = title;
 
-    const todoDueDate = document.createElement('h4');
-    todoDueDate.textContent = date;
+    const todoDueDate = document.createElement('input');
+    todoDueDate.setAttribute('type', 'date');
+    todoDueDate.setAttribute('disabled', '');
+    todoDueDate.setAttribute('value', date);
 
-    const todoPriority = document.createElement('h4');
-    todoPriority.textContent = priority;
+    const todoPriority = createPriority(priority);
+    todoPriority.setAttribute('disabled', '');
 
     const todoDescription = document.createElement('p');
     todoDescription.textContent = description;
+    todoDescription.style.visibility = 'hidden';
+    todoDescription.style.fontSize = '2px';
+    todoDescription.setAttribute('contenteditable', 'false');
 
-    todoItem.append(todoTitle, todoDueDate, todoPriority, todoDescription);
+    const showDescriptionBtn = document.createElement('button');
+    showDescriptionBtn.classList.add('show-description-btn');
+    showDescriptionBtn.textContent = 'show description';
+
+    const updateButton = document.createElement('button');
+    updateButton.classList.add('update-btn');
+    updateButton.textContent = 'Edit';
+
+    showDescriptionBtn.addEventListener('click', () => {
+      const visibility = todoDescription.style.visibility;
+      if (visibility === 'hidden') {
+        todoDescription.style.fontSize = '16px';
+        todoDescription.style.visibility = 'visible';
+        todoDescription.setAttribute('contenteditable', 'true');
+        todoTitle.setAttribute('contenteditable', 'true');
+        todoPriority.removeAttribute('disabled');
+        todoDueDate.removeAttribute('disabled');
+      } else if (visibility === 'visible') {
+        todoDescription.style.visibility = 'hidden';
+        todoDescription.style.fontSize = '2px';
+        todoDescription.setAttribute('contenteditable', 'false');
+        todoTitle.setAttribute('contenteditable', 'false');
+        todoPriority.setAttribute('disabled', '');
+        todoDueDate.setAttribute('disabled', '');
+      }
+    });
+
+    todoItem.append(
+      todoTitle,
+      todoDueDate,
+      todoPriority,
+      todoDescription,
+      showDescriptionBtn,
+      updateButton,
+    );
 
     return todoItem;
   };
@@ -78,12 +145,6 @@ const toDo = (function () {
     todoItems.append(item);
   };
 
-  const createOption = (value) => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.text = value;
-    return option;
-  };
 
   const createTodoForm = () => {
     const todoItemForm = document.createElement('form');
@@ -91,28 +152,45 @@ const toDo = (function () {
 
     const todoTitleInput = document.createElement('input');
     todoTitleInput.setAttribute('type', 'text');
+    todoTitleInput.setAttribute('contenteditable', 'true');
     todoTitleInput.setAttribute('name', 'title');
+    todoTitleInput.setAttribute('required', '');
 
-    const todoDescriptionInput = document.createElement('input');
-    todoDescriptionInput.setAttribute('type', 'text');
+    const todoDescriptionInput = document.createElement('textarea');
+    todoDescriptionInput.setAttribute('cols', '50');
+    todoDescriptionInput.setAttribute('rows', '10');
     todoDescriptionInput.setAttribute('name', 'description');
 
     const todoDuedateInput = document.createElement('input');
     todoDuedateInput.setAttribute('type', 'date');
     todoDuedateInput.setAttribute('name', 'date');
 
-    const todoPriorityInput = document.createElement('select');
-    todoPriorityInput.setAttribute('name', 'priority');
+    const today = new Date();
+    function formatDate(date, format) {
+      const map = {
+        mm: date.getMonth() + 1,
+        dd: date.getDate(),
+        yyyy: date.getFullYear(),
+      };
+      if (map.mm < 10) {
+        map.mm = `0${map.mm}`;
+      }
+      if (map.dd < 10) {
+        map.dd = `0${map.dd}`;
+      }
 
-    const hightPriotity = createOption('High');
-    const mediumPriority = createOption('Medium');
-    const lowPriority = createOption('Low');
+      return format.replace(/mm|dd|yyyy/gi, (matched) => map[matched]);
+    }
+
+    const formatToday = formatDate(today, 'yyyy-mm-dd');
+    todoDuedateInput.setAttribute('value', formatToday);
+    todoDuedateInput.setAttribute('required', '');
+
+    const todoPriorityInput = createPriority('Low');
 
     const submitBtn = document.createElement('button');
     submitBtn.classList.add('submit-new-form');
     submitBtn.textContent = 'submit';
-
-    todoPriorityInput.append(lowPriority, mediumPriority, hightPriotity);
 
     todoItemForm.append(
       todoTitleInput,
@@ -133,7 +211,6 @@ const toDo = (function () {
 
   return {
     createTodoContent,
-    getForm,
     getContent,
     removeForm,
     createNewITem,
@@ -144,8 +221,7 @@ const toDo = (function () {
   };
 }());
 
-
-const todoEvents = (function () {
+const todoEvents = (function todoEvents() {
   const AddNewitem = (e) => {
     e.preventDefault();
 
@@ -155,7 +231,12 @@ const todoEvents = (function () {
       date,
       priority,
     } = e.target;
-    const todoItem = toDo.createNewITem(title.value, description.value, date.value, priority.value);
+    const todoItem = toDo.createNewITem(
+      title.value,
+      description.value,
+      date.value,
+      priority.value,
+    );
     toDo.showNewItem(todoItem);
     toDo.removeForm();
     toDo.createNewItemButton();
