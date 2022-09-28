@@ -111,8 +111,8 @@ const TodoForm = () => {
 
     const todoDescription = document.createElement('p');
     todoDescription.textContent = description;
-    todoDescription.style.visibility = 'hidden';
-    todoDescription.style.fontSize = '0px';
+    todoDescription.hidden = true;
+    todoDescription.setAttribute('fontSize', '0px');
     todoDescription.setAttribute('contenteditable', 'false');
 
     const showDescriptionBtn = document.createElement('button');
@@ -134,22 +134,72 @@ const TodoForm = () => {
     });
 
     showDescriptionBtn.addEventListener('click', () => {
-      todoDescription.style.fontSize = '16px';
-      todoDescription.style.visibility = 'visible';
-      todoDescription.setAttribute('contenteditable', 'true');
-      todoTitle.setAttribute('contenteditable', 'true');
-      todoPriority.removeAttribute('disabled');
-      todoDueDate.removeAttribute('disabled');
+      const item = showDescriptionBtn.parentNode;
+      const children = item.childNodes;
+      children.forEach((child) => {
+        if (child.nodeName === 'INPUT' || child.nodeName === 'SELECT') {
+          const isDisabled = child.attributes.disabled;
+          if (isDisabled) {
+            child.removeAttribute('disabled');
+          } else {
+            child.setAttribute('disabled');
+          }
+        } else if (child.nodeName === 'H2' || child.nodeName === 'P') {
+          const isEditable = child.attributes.contenteditable.value;
+          if (isEditable) {
+            child.setAttribute('contenteditable', 'true');
+          } else {
+            child.setAttribute('contenteditable', 'false');
+          }
+          if (child.nodeName === 'P') {
+            const isVisible = child.hidden;
+            if (isVisible) {
+              child.removeAttribute('hidden');
+              child.removeAttribute('fontSize');
+              child.setAttribute('fontSize', '16px');
+            } else {
+              child.setAttribute('hidden', '');
+              child.removeAttribute('fontSize');
+              child.setAttribute('fontSize', '0px');
+            }
+          }
+        }
+      });
       todoItem.append(hideDescriptionBtn);
       todoItem.removeChild(showDescriptionBtn);
     });
     hideDescriptionBtn.addEventListener('click', () => {
-      todoDescription.style.visibility = 'hidden';
-      todoDescription.style.fontSize = '0px';
-      todoDescription.setAttribute('contenteditable', 'false');
-      todoTitle.setAttribute('contenteditable', 'false');
-      todoPriority.setAttribute('disabled', '');
-      todoDueDate.setAttribute('disabled', '');
+      const item = hideDescriptionBtn.parentNode;
+      const children = item.childNodes;
+      children.forEach((child) => {
+        if (child.nodeName === 'INPUT' || child.nodeName === 'SELECT') {
+          const isDisabled = child.attributes.disabled;
+          if (isDisabled) {
+            child.removeAttribute('disabled');
+          } else {
+            child.setAttribute('disabled', '');
+          }
+        } else if (child.nodeName === 'H2' || child.nodeName === 'P') {
+          const isEditable = child.attributes.contenteditable.value;
+          if (isEditable) {
+            child.setAttribute('contenteditable', 'true');
+          } else {
+            child.setAttribute('contenteditable', 'false');
+          }
+          if (child.nodeName === 'P') {
+            const isVisible = child.hidden;
+            if (isVisible) {
+              child.removeAttribute('hidden');
+              child.removeAttribute('fontSize');
+              child.setAttribute('fontSize', '16px');
+            } else {
+              child.setAttribute('hidden', '');
+              child.removeAttribute('fontSize');
+              child.setAttribute('fontSize', '0px');
+            }
+          }
+        }
+      });
       todoItem.append(showDescriptionBtn);
       todoItem.removeChild(hideDescriptionBtn);
     });
