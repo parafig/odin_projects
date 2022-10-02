@@ -3,221 +3,10 @@
 // TODO crear logica capaz de declarar una tarea como terminada.
 // TODO refactorizar el evento que permite editar un item y las cosas
 // relacionadas a el.
-
-const TodoForm = () => {
-  const createOption = (value) => {
-    const option = document.createElement('option');
-    option.value = value;
-    option.text = value;
-    return option;
-  };
-
-  const formatDate = (date, format) => {
-    const map = {
-      mm: date.getMonth() + 1,
-      dd: date.getDate(),
-      yyyy: date.getFullYear(),
-    };
-    if (map.mm < 10) {
-      map.mm = `0${map.mm}`;
-    }
-    if (map.dd < 10) {
-      map.dd = `0${map.dd}`;
-    }
-
-    return format.replace(/mm|dd|yyyy/gi, (matched) => map[matched]);
-  };
-
-  const createDueDate = () => {
-    const todoDuedateInput = document.createElement('input');
-    todoDuedateInput.setAttribute('type', 'date');
-    todoDuedateInput.setAttribute('name', 'date');
-
-    const today = new Date();
-    const formatToday = formatDate(today, 'yyyy-mm-dd');
-    todoDuedateInput.setAttribute('value', formatToday);
-    todoDuedateInput.setAttribute('required', '');
-
-    return todoDuedateInput;
-  };
-
-  const createPriority = (valueSelected) => {
-    const hightPriotity = createOption('High');
-    const mediumPriority = createOption('Medium');
-    const lowPriority = createOption('Low');
-    const todoPriorityInput = document.createElement('select');
-    todoPriorityInput.setAttribute('name', 'priority');
-
-    todoPriorityInput.append(lowPriority, mediumPriority, hightPriotity);
-
-    const children = todoPriorityInput.childNodes;
-    children.forEach((child) => {
-      if (child.value === valueSelected) {
-        child.setAttribute('selected', '');
-      }
-    });
-
-    return todoPriorityInput;
-  };
-
-  const createForm = () => {
-    const todoItemForm = document.createElement('form');
-    todoItemForm.classList.add('todo-item-form');
-
-    const todoTitleInput = document.createElement('input');
-    todoTitleInput.setAttribute('type', 'text');
-    todoTitleInput.setAttribute('name', 'title');
-    todoTitleInput.setAttribute('required', '');
-
-    const todoDescriptionInput = document.createElement('textarea');
-    todoDescriptionInput.setAttribute('cols', '50');
-    todoDescriptionInput.setAttribute('rows', '10');
-    todoDescriptionInput.setAttribute('name', 'description');
-
-    const todoDuedateInput = createDueDate();
-
-    const todoPriorityInput = createPriority('Low');
-
-    const submitBtn = document.createElement('button');
-    submitBtn.classList.add('submit-new-form');
-    submitBtn.textContent = 'submit';
-
-    todoItemForm.append(
-      todoTitleInput,
-      todoDescriptionInput,
-      todoDuedateInput,
-      todoPriorityInput,
-      submitBtn,
-    );
-
-    return todoItemForm;
-  };
-
-  const createNewITem = (title, description, date, priority) => {
-    const todoItem = document.createElement('div');
-    todoItem.classList.add('todo-item');
-
-    const todoTitle = document.createElement('h2');
-    todoTitle.setAttribute('contenteditable', 'false');
-    todoTitle.textContent = title;
-
-    const todoDueDate = document.createElement('input');
-    todoDueDate.setAttribute('type', 'date');
-    todoDueDate.setAttribute('disabled', '');
-    todoDueDate.setAttribute('value', date);
-
-    const todoPriority = createPriority(priority);
-    todoPriority.setAttribute('disabled', '');
-
-    const todoDescription = document.createElement('p');
-    todoDescription.textContent = description;
-    todoDescription.hidden = true;
-    todoDescription.setAttribute('fontSize', '0px');
-    todoDescription.setAttribute('contenteditable', 'false');
-
-    const showDescriptionBtn = document.createElement('button');
-    showDescriptionBtn.classList.add('show-description-btn');
-    showDescriptionBtn.textContent = 'show description';
-
-    const hideDescriptionBtn = document.createElement('button');
-    hideDescriptionBtn.classList.add('hide-description-btn');
-    hideDescriptionBtn.textContent = 'hide description';
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.classList.add('delete-btn');
-    deleteBtn.textContent = 'Remove';
-
-    deleteBtn.addEventListener('click', () => {
-      const item = deleteBtn.parentNode;
-      const items = item.parentNode;
-      items.removeChild(item);
-    });
-
-    showDescriptionBtn.addEventListener('click', () => {
-      const item = showDescriptionBtn.parentNode;
-      const children = item.childNodes;
-      children.forEach((child) => {
-        if (child.nodeName === 'INPUT' || child.nodeName === 'SELECT') {
-          const isDisabled = child.attributes.disabled;
-          if (isDisabled) {
-            child.removeAttribute('disabled');
-          } else {
-            child.setAttribute('disabled');
-          }
-        } else if (child.nodeName === 'H2' || child.nodeName === 'P') {
-          const isEditable = child.attributes.contenteditable.value;
-          if (isEditable) {
-            child.setAttribute('contenteditable', 'true');
-          } else {
-            child.setAttribute('contenteditable', 'false');
-          }
-          if (child.nodeName === 'P') {
-            const isVisible = child.hidden;
-            if (isVisible) {
-              child.removeAttribute('hidden');
-              child.removeAttribute('fontSize');
-              child.setAttribute('fontSize', '16px');
-            } else {
-              child.setAttribute('hidden', '');
-              child.removeAttribute('fontSize');
-              child.setAttribute('fontSize', '0px');
-            }
-          }
-        }
-      });
-      todoItem.append(hideDescriptionBtn);
-      todoItem.removeChild(showDescriptionBtn);
-    });
-    hideDescriptionBtn.addEventListener('click', () => {
-      const item = hideDescriptionBtn.parentNode;
-      const children = item.childNodes;
-      children.forEach((child) => {
-        if (child.nodeName === 'INPUT' || child.nodeName === 'SELECT') {
-          const isDisabled = child.attributes.disabled;
-          if (isDisabled) {
-            child.removeAttribute('disabled');
-          } else {
-            child.setAttribute('disabled', '');
-          }
-        } else if (child.nodeName === 'H2' || child.nodeName === 'P') {
-          const isEditable = child.attributes.contenteditable.value;
-          if (isEditable) {
-            child.setAttribute('contenteditable', 'true');
-          } else {
-            child.setAttribute('contenteditable', 'false');
-          }
-          if (child.nodeName === 'P') {
-            const isVisible = child.hidden;
-            if (isVisible) {
-              child.removeAttribute('hidden');
-              child.removeAttribute('fontSize');
-              child.setAttribute('fontSize', '16px');
-            } else {
-              child.setAttribute('hidden', '');
-              child.removeAttribute('fontSize');
-              child.setAttribute('fontSize', '0px');
-            }
-          }
-        }
-      });
-      todoItem.append(showDescriptionBtn);
-      todoItem.removeChild(hideDescriptionBtn);
-    });
-
-    todoItem.append(
-      todoTitle,
-      todoDueDate,
-      todoPriority,
-      todoDescription,
-      showDescriptionBtn,
-      deleteBtn,
-    );
-
-    return todoItem;
-  };
-
-  return { createForm, createNewITem };
-};
+// TODO crear pub sub que divide la creacion y eliminacion de nodos o actualizaciones,
+// y los eventos que la invocan
+// TODO quizas crear una lista de botones o de todos los elementos
+import TodoForm from './form';
 
 const toDo = (function toDo() {
   const createNewItemBtn = () => {
@@ -289,6 +78,67 @@ const toDo = (function toDo() {
 }());
 
 const todoEvents = (function todoEvents() {
+  const changeInputState = (element) => {
+    if (element.nodeName === 'INPUT' || element.nodeName === 'SELECT') {
+      const isDisabled = element.attributes.disabled;
+      if (isDisabled) {
+        element.removeAttribute('disabled');
+      } else {
+        element.setAttribute('disabled', '');
+      }
+    } else if (element.nodeName === 'H2' || element.nodeName === 'P') {
+      const isEditable = element.attributes.contenteditable.value;
+      if (isEditable) {
+        element.setAttribute('contenteditable', 'true');
+      } else {
+        element.setAttribute('contenteditable', 'false');
+      }
+      if (element.nodeName === 'P') {
+        const isVisible = element.hidden;
+        if (isVisible) {
+          element.removeAttribute('hidden');
+          element.removeAttribute('fontSize');
+          element.setAttribute('fontSize', '16px');
+        } else {
+          element.setAttribute('hidden', '');
+          element.removeAttribute('fontSize');
+          element.setAttribute('fontSize', '0px');
+        }
+      }
+    }
+  };
+
+  const createBtn = (className, text) => {
+    const btn = document.createElement('button');
+    btn.classList.add(className);
+    btn.textContent = text;
+    return btn;
+  };
+
+  const editItem = (e) => {
+    const buttons = ['show-description-btn', 'hide-description-btn'];
+    let btn;
+    let replaceBtn;
+
+    const index = buttons.indexOf(e.target.className);
+    if (index >= 0) {
+      btn = e.target;
+      if (btn.className === buttons[0]) {
+        replaceBtn = createBtn(buttons[1], 'hide');
+      } else {
+        replaceBtn = createBtn(buttons[0], 'show');
+      }
+      const item = btn.parentNode;
+      const children = item.childNodes;
+      children.forEach((child) => {
+        changeInputState(child);
+      });
+
+      item.append(replaceBtn);
+      item.removeChild(btn);
+    }
+  };
+
   const AddNewitem = (e) => {
     e.preventDefault();
 
@@ -305,6 +155,7 @@ const todoEvents = (function todoEvents() {
       date.value,
       priority.value,
     );
+    itemContent.addEventListener('click', editItem);
     toDo.showNewItem(itemContent);
     toDo.removeForm();
     toDo.createNewItemButton();
@@ -313,8 +164,8 @@ const todoEvents = (function todoEvents() {
   const startNewTodoItem = (e) => {
     if (e.target.className === 'btn-new-item') {
       toDo.removeNewItemButton();
-      const newForm = TodoForm();
-      const formContent = newForm.createForm();
+      const form = TodoForm();
+      const formContent = form.createForm();
       formContent.addEventListener('submit', AddNewitem);
 
       const todoContent = toDo.getContent();
